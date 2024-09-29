@@ -27,16 +27,17 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<ResponseBuilder> register(@Validated @RequestBody UserDTO userDTO) {
+        String token;
         try {
-            registerService.register(userDTO);
+            token = registerService.register(userDTO);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>(new ResponseBuilder("Nome de usuário ou email já cadastrado"),
+            return new ResponseEntity<>(new ResponseBuilder(null),
                     HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(new ResponseBuilder("Erro ao cadastrar usuário"),
+            return new ResponseEntity<>(new ResponseBuilder(null),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new ResponseBuilder("Usuário cadastrado com sucesso"),
+        return new ResponseEntity<>(new ResponseBuilder(token),
                 HttpStatus.CREATED);
     }
 
