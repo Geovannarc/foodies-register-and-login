@@ -4,6 +4,7 @@ import org.example.dto.UserDTO;
 import org.example.model.UserModel;
 import org.example.repository.RegisterRepository;
 import org.example.service.RegisterService;
+import org.example.util.JwtUtil;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +21,9 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
     public String register(final UserDTO userDTO) {
         try {
@@ -29,7 +33,7 @@ public class RegisterServiceImpl implements RegisterService {
             user.setEmail(userDTO.getEmail());
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
             registerRepository.save(user);
-            return "User registered successfully";
+            return jwtUtil.generateToken(user.getUsername());
         } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
         }
