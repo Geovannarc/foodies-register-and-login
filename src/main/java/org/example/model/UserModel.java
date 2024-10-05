@@ -20,6 +20,8 @@ public class UserModel {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String birthDate;
+
     private String passwordHash;
 
     private Long profileId;

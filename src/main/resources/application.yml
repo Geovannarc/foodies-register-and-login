@@ -10,6 +10,12 @@ spring:
       pool-name: HikariCP
       connection-timeout: 30000
       max-lifetime: 1800000
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 2MB
   jpa:
     hibernate:
       ddl-auto: update

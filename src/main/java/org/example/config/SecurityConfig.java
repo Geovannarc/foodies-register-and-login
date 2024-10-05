@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/register", "/login").permitAll()  // Permite acesso a essas rotas sem autenticação
+                .requestMatchers("/register", "/login", "/create-profile").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }
