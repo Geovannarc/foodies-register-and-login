@@ -11,7 +11,7 @@ public class AwsConfig {
     @Bean
     public S3Client S3Service() {
         return S3Client.builder()
-                .region(Region.US_EAST_1)
+                .region(Region.US_EAST_2)
                 .build();
     }
 }
