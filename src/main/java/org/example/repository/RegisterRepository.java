@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RegisterRepository extends JpaRepository<UserModel, Long> {
 
-    @Query(value = "select * from users where username = :username)", nativeQuery = true)
+    @Query(value = "select * from users where username = :username", nativeQuery = true)
     UserModel findByUsername(String username);
 
     @Modifying
