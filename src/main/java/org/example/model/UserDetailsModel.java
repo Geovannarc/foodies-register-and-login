@@ -16,6 +16,7 @@ public class UserDetailsModel {
 
     @Id
     private Long id;
+    private Long userId;
     private String bio;
     private String imageURL;
     private String name;

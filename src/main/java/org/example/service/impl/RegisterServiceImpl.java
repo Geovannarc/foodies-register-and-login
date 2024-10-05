@@ -52,11 +52,13 @@ public class RegisterServiceImpl implements RegisterService {
         try {
             log.info("Saving user details: " + user.getUsername());
             UserDetailsModel userModel = new UserDetailsModel();
+            Long userId = registerRepository.findByUsername(user.getUsername()).getId();
+            userModel.setUserId(userId);
             userModel.setName(user.getName());
             userModel.setBio(user.getBio());
             userModel.setUsername(user.getUsername());
             userModel.setImageURL(user.getImageURL());
-            registerRepository.registerUserDetails(userModel.getName(), userModel.getBio(), userModel.getImageURL());
+            registerRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL());
             log.info("User details saved: {}", user.getUsername());
         } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
