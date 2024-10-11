@@ -1,11 +1,12 @@
 package org.example.service.impl;
 
 import lombok.extern.log4j.Log4j2;
+import org.example.dto.TagDTO;
 import org.example.dto.UserDTO;
 import org.example.dto.UserDetailsDTO;
 import org.example.model.UserDetailsModel;
 import org.example.model.UserModel;
-import org.example.repository.RegisterRepository;
+import org.example.repository.UserRepository;
 import org.example.service.RegisterService;
 import org.example.util.JwtUtil;
 import org.hibernate.JDBCException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -20,7 +22,7 @@ import java.util.Locale;
 public class RegisterServiceImpl implements RegisterService {
 
     @Autowired
-    private RegisterRepository registerRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -37,9 +39,9 @@ public class RegisterServiceImpl implements RegisterService {
             user.setUsername(userDTO.getUsername().toLowerCase(Locale.ROOT));
             user.setBirthDate(userDTO.getBirthDate());
             user.setEmail(userDTO.getEmail());
-            user.setProfileId(1L);
+            user.setProfileId(1283L);
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
-            registerRepository.save(user);
+            userRepository.save(user);
             log.info("User saved: {}", user.getUsername());
             return jwtUtil.generateToken(user.getUsername());
         } catch (JDBCException e) {
@@ -52,13 +54,13 @@ public class RegisterServiceImpl implements RegisterService {
         try {
             log.info("Saving user details: " + user.getUsername());
             UserDetailsModel userModel = new UserDetailsModel();
-            Long userId = registerRepository.findByUsername(user.getUsername()).getId();
+            Long userId = userRepository.findByUsername(user.getUsername()).getId();
             userModel.setUserId(userId);
             userModel.setName(user.getName());
             userModel.setBio(user.getBio());
             userModel.setUsername(user.getUsername());
             userModel.setImageURL(user.getImageURL());
-            registerRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL());
+            userRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL());
             log.info("User details saved: {}", user.getUsername());
         } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
@@ -72,5 +74,9 @@ public class RegisterServiceImpl implements RegisterService {
         if(!userDTO.getEmail().contains("@") || !userDTO.getEmail().contains(".")) {
             throw new RuntimeException("Invalid email");
         }
+    }
+
+    private void registerUserTags(UserDetailsDTO user, List<TagDTO> tags) {
+
     }
 }

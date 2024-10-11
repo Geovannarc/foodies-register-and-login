@@ -2,7 +2,7 @@ package org.example.service.impl;
 
 import lombok.extern.log4j.Log4j2;
 import org.example.model.UserModel;
-import org.example.repository.LoginRepository;
+import org.example.repository.UserRepository;
 import org.example.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class LoginServiceImpl implements org.example.service.LoginService {
 
     @Autowired
-    private LoginRepository loginRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -24,7 +24,7 @@ public class LoginServiceImpl implements org.example.service.LoginService {
     public String login(String username, final String password) throws Exception {
         username = username.toLowerCase();
         log.info("Logging in user: " + username);
-        UserModel user = loginRepository.findByUsername(username);
+        UserModel user = userRepository.findByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
             log.info("User logged in: " + username);
             return jwtUtil.generateToken(username);

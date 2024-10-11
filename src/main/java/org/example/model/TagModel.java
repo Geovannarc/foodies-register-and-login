@@ -7,19 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "userdetails")
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailsModel {
+@Entity(name = "tag")
+public class TagModel {
 
-    @Id
-    private Long id;
-    private Long userId;
-    private String bio;
-    private String imageURL;
-    private String name;
-    private String username;
-
+        @Id
+        private Long id;
+        private String name;
 }
