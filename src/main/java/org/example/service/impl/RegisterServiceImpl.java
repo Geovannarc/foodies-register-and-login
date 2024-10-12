@@ -37,7 +37,7 @@ public class RegisterServiceImpl implements RegisterService {
             log.info("Saving user: " + userDTO.getUsername());
             UserModel user = new UserModel();
             user.setUsername(userDTO.getUsername().toLowerCase(Locale.ROOT));
-            user.setBirthDate(userDTO.getBirthDate());
+            user.setDateBirth(userDTO.getBirthDate());
             user.setEmail(userDTO.getEmail());
             user.setProfileId(1283L);
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
