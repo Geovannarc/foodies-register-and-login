@@ -3,6 +3,7 @@ package org.example.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
+@Log4j2
 public class JwtUtil {
 
     private String SECRET_KEY = "secret";
@@ -48,6 +50,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, String username) {
+        log.info("Validating token: {}, {}", username, token);
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
