@@ -20,7 +20,7 @@ public class UserModel {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String dateBirth;
+    private String date_birth;
 
     private String passwordHash;
 
