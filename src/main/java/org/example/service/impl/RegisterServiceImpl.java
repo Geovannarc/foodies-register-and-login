@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,20 +31,24 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private S3Service s3Service;
+
     @Override
     public String register(final UserDTO userDTO) {
         try {
             validateUser(userDTO);
             log.info("Saving user: " + userDTO.getUsername());
             UserModel user = new UserModel();
-            user.setUsername(userDTO.getUsername().toLowerCase(Locale.ROOT));
+            user.setUsername(userDTO.getUsername().toLowerCase(Locale.ROOT).trim());
             user.setDate_birth(userDTO.getDateBirth());
-            user.setEmail(userDTO.getEmail());
+            user.setEmail(userDTO.getEmail().toLowerCase().trim());
             user.setProfileId(1283L);
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
+            user.setToken(jwtUtil.generateToken(userDTO.getUsername()));
             userRepository.save(user);
             log.info("User saved: {}", user.getUsername());
-            return jwtUtil.generateToken(user.getUsername());
+            return user.getToken();
         } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
         }
@@ -52,7 +57,10 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public void registerUserDetails(UserDetailsDTO user) {
         try {
-            log.info("Saving user details: " + user.getUsername());
+            log.info("Salvando detalhes do usuário: {}", user.getUsername());
+            String imageURL = s3Service.uploadFile(user.getImage(), "profile-pic-foodies");
+            user.setImageURL(imageURL);
+            log.info("Imagem salva: {}", imageURL);
             UserDetailsModel userModel = new UserDetailsModel();
             Long userId = userRepository.findByUsername(user.getUsername()).getId();
             userModel.setUserId(userId);
@@ -62,7 +70,7 @@ public class RegisterServiceImpl implements RegisterService {
             userModel.setImageURL(user.getImageURL());
             userRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL());
             log.info("User details saved: {}", user.getUsername());
-        } catch (JDBCException e) {
+        } catch (JDBCException | IOException e) {
             throw new RuntimeException("Failed to connect to database");
         }
     }
@@ -76,7 +84,4 @@ public class RegisterServiceImpl implements RegisterService {
         }
     }
 
-    private void registerUserTags(UserDetailsDTO user, List<TagDTO> tags) {
-
-    }
 }

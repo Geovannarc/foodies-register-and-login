@@ -19,5 +19,10 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
             "values (:userId, :name, :bio, :imageURL, CURRENT_DATE, CURRENT_DATE)", nativeQuery = true)
     void registerUserDetails(Long userId, String name, String bio, String imageURL);
 
+    @Modifying
+    @Transactional
+    @Query(value = "update user set token = :token where username = :username", nativeQuery = true)
+    void updateToken(String token, String username);
+
 }
 

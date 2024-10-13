@@ -33,9 +33,6 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private S3Service s3Service;
-
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> register(@Validated @RequestBody UserDTO userDTO) {
@@ -70,20 +67,14 @@ public class UserController {
     @PostMapping(value = "create-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> createProfile(@Validated @ModelAttribute UserDetailsDTO user,
-                                                         @RequestHeader("Authorization") String token)
-            throws IOException {
+                                                         @RequestHeader("Authorization") String token) {
         if (!jwtUtil.validateToken(token, user.getUsername())) {
             log.info("Usuário não autenticado");
             return new ResponseEntity<>(new ResponseBuilder(null, "Usuário não autenticado"),
                     HttpStatus.BAD_REQUEST);
         }
         try {
-            log.info("Salvando detalhes do usuário: {}", user.getUsername());
-            String imageURL = s3Service.uploadFile(user.getImage(), "profile-pic-foodies");
-            user.setImageURL(imageURL);
-            log.info("Imagem salva: {}", imageURL);
             registerService.registerUserDetails(user);
-            log.info("Detalhes do usuário salvos: {}", user.getUsername());
         } catch (DataIntegrityViolationException e) {
             log.info("Dados inválidos: {}", e.getMessage());
             return new ResponseEntity<>(new ResponseBuilder(null, "Dados inválidos"),
@@ -107,6 +98,19 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResponseBuilder(null, "Usuário autenticado"),
+                HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/logout", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseBuilder> logout(@RequestHeader("Authorization") String token,
+                                                  @RequestParam("username") String username) {
+        if (token == null || !jwtUtil.validateToken(token, username)) {
+            return new ResponseEntity<>(new ResponseBuilder(null, "Usuário não autenticado"),
+                    HttpStatus.BAD_REQUEST);
+        }
+        jwtUtil.invalidateToken(username);
+        return new ResponseEntity<>(new ResponseBuilder(null, "Usuário deslogado"),
                 HttpStatus.OK);
     }
 }

@@ -18,4 +18,5 @@ public class UserDTO {
     private String dateBirth;
     @NonNull
     private String passwordHash;
+    private String token;
 }

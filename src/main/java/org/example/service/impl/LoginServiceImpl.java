@@ -22,12 +22,14 @@ public class LoginServiceImpl implements org.example.service.LoginService {
     private JwtUtil jwtUtil;
 
     public String login(String username, final String password) throws Exception {
-        username = username.toLowerCase();
+        username = username.toLowerCase().trim();
         log.info("Logging in user: " + username);
         UserModel user = userRepository.findByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
+            String token = jwtUtil.generateToken(username);
+            userRepository.updateToken(token, username);
             log.info("User logged in: " + username);
-            return jwtUtil.generateToken(username);
+            return token;
         } else {
             log.error("Failed to login user: " + username);
             throw new Exception("Invalid username or password");

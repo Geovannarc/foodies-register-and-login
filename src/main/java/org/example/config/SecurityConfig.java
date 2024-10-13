@@ -24,7 +24,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests()
                 .requestMatchers("/user/register", "/user/login", "/user/create-profile", "/tag/listAll", "/tag/save",
-                        "/user/validate").permitAll()
+                        "/user/validate", "/user/logout").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }

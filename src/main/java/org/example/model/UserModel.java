@@ -24,5 +24,7 @@ public class UserModel {
 
     private String passwordHash;
 
+    private String token;
+
     private Long profileId;
 }
