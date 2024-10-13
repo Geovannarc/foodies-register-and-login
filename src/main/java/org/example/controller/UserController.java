@@ -18,11 +18,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @Log4j2
-public class RegisterController {
+@RequestMapping("/user")
+public class UserController {
 
     @Autowired
     private RegisterService registerService;
@@ -36,7 +36,8 @@ public class RegisterController {
     @Autowired
     private S3Service s3Service;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> register(@Validated @RequestBody UserDTO userDTO) {
         String token;
         try {
@@ -52,7 +53,8 @@ public class RegisterController {
                 HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> login(@Validated @RequestBody UserLoginDTO userDTO) {
         String token;
         try {
@@ -65,7 +67,8 @@ public class RegisterController {
                 HttpStatus.OK);
     }
 
-    @PostMapping(value = "create-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "create-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> createProfile(@Validated @ModelAttribute UserDetailsDTO user,
                                                          @RequestHeader("Authorization") String token)
             throws IOException {
@@ -93,5 +96,17 @@ public class RegisterController {
         log.info("Detalhes do usuário salvos com sucesso: {}", user.getUsername());
         return new ResponseEntity<>(new ResponseBuilder(token, null),
                 HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/validate", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseBuilder> validateUser(@RequestHeader("Authorization") String token,
+                                                        @RequestParam("username") String username) {
+        if (username == null || !jwtUtil.validateToken(token, username)) {
+            return new ResponseEntity<>(new ResponseBuilder(null, "Usuário não autenticado"),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResponseBuilder(null, "Usuário autenticado"),
+                HttpStatus.OK);
     }
 }
