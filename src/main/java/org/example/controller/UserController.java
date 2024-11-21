@@ -4,9 +4,9 @@ import lombok.extern.log4j.Log4j2;
 import org.example.dto.UserDTO;
 import org.example.dto.UserDetailsDTO;
 import org.example.dto.UserLoginDTO;
+import org.example.dto.UserResponseDTO;
 import org.example.service.LoginService;
 import org.example.service.RegisterService;
-import org.example.service.impl.S3Service;
 import org.example.util.JwtUtil;
 import org.example.util.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @RestController
 @Log4j2
@@ -36,9 +35,9 @@ public class UserController {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> register(@Validated @RequestBody UserDTO userDTO) {
-        String token;
+        UserResponseDTO user;
         try {
-            token = registerService.register(userDTO);
+            user = registerService.register(userDTO);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(new ResponseBuilder(null, "Dados inválidos"),
                     HttpStatus.BAD_REQUEST);
@@ -46,21 +45,21 @@ public class UserController {
             return new ResponseEntity<>(new ResponseBuilder(null, "Erro ao salvar usuário"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new ResponseBuilder(token, "Usuário registrado com sucesso"),
+        return new ResponseEntity<>(new ResponseBuilder(user.getToken(), user.getId()),
                 HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseBuilder> login(@Validated @RequestBody UserLoginDTO userDTO) {
-        String token;
+        UserResponseDTO user;
         try {
-            token = loginService.login(userDTO.getUsername(), userDTO.getPasswordHash());
+            user = loginService.login(userDTO.getUsername(), userDTO.getPasswordHash());
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseBuilder(null, "Nome de usuário ou senha inválidos"),
                     HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseBuilder(token, "Usuário autenticado com sucesso"),
+        return new ResponseEntity<>(new ResponseBuilder(user.getToken(), user.getId()),
                 HttpStatus.OK);
     }
 
@@ -112,5 +111,15 @@ public class UserController {
         jwtUtil.invalidateToken(username);
         return new ResponseEntity<>(new ResponseBuilder(null, "Usuário deslogado"),
                 HttpStatus.OK);
+    }
+    @GetMapping
+    public ResponseEntity<ResponseBuilder> getUserId(@RequestHeader("Authorization") String token,
+                                                     @RequestParam("username") String username) {
+        if (token == null || !jwtUtil.validateToken(token, username)) {
+            return new ResponseEntity<>(new ResponseBuilder(null, "Usuário não autenticado"),
+                    HttpStatus.BAD_REQUEST);
+        }
+        Long userId = loginService.getUserId(username);
+        return new ResponseEntity<>(new ResponseBuilder(null, userId), HttpStatus.OK);
     }
 }

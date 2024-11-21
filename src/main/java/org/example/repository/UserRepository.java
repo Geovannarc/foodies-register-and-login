@@ -24,5 +24,9 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
     @Query(value = "update user set token = :token where username = :username", nativeQuery = true)
     void updateToken(String token, String username);
 
+    @Query(value = "select id from user where username = :username", nativeQuery = true)
+    Long getUserId(String username);
+
+
 }
 

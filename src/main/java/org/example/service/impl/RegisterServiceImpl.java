@@ -1,9 +1,9 @@
 package org.example.service.impl;
 
 import lombok.extern.log4j.Log4j2;
-import org.example.dto.TagDTO;
 import org.example.dto.UserDTO;
 import org.example.dto.UserDetailsDTO;
+import org.example.dto.UserResponseDTO;
 import org.example.model.UserDetailsModel;
 import org.example.model.UserModel;
 import org.example.repository.UserRepository;
@@ -15,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Base64;
 import java.util.Locale;
 
 @Service
@@ -35,7 +35,7 @@ public class RegisterServiceImpl implements RegisterService {
     private S3Service s3Service;
 
     @Override
-    public String register(final UserDTO userDTO) {
+    public UserResponseDTO register(final UserDTO userDTO) {
         try {
             validateUser(userDTO);
             log.info("Saving user: " + userDTO.getUsername());
@@ -48,10 +48,15 @@ public class RegisterServiceImpl implements RegisterService {
             user.setToken(jwtUtil.generateToken(userDTO.getUsername()));
             userRepository.save(user);
             log.info("User saved: {}", user.getUsername());
-            return user.getToken();
+            String id = encodeId(userRepository.getUserId(user.getUsername()));
+            return new UserResponseDTO(id, user.getToken());
         } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
         }
+    }
+
+    private static String encodeId(Long id) {
+        return Base64.getUrlEncoder().encodeToString(id.toString().getBytes());
     }
 
     @Override
