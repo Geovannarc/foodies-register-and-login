@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -46,5 +47,9 @@ public class LoginServiceImpl implements org.example.service.LoginService {
 
     private static String encodeId(Long id) {
         return Base64.getUrlEncoder().encodeToString(id.toString().getBytes());
+    }
+
+    public List<String> getUsers(String name) {
+        return userRepository.findByName(name);
     }
 }

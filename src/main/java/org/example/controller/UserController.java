@@ -122,4 +122,9 @@ public class UserController {
         Long userId = loginService.getUserId(username);
         return new ResponseEntity<>(new ResponseBuilder(null, userId), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/getUsers", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseBuilder> getUsers(@RequestParam("name") String name) {
+        return new ResponseEntity<>(new ResponseBuilder(null, loginService.getUsers(name)), HttpStatus.OK);
+    }
 }

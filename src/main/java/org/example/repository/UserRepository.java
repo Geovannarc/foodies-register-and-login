@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<UserModel, Long> {
 
@@ -28,5 +30,8 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
     Long getUserId(String username);
 
 
+    @Query(value = "select user.username,imageurl from user inner join userdetails on userdetails.user_id = user.id " +
+            "where user.username like  %:name% limit 20", nativeQuery = true)
+    List<String> findByName(String name);
 }
 
