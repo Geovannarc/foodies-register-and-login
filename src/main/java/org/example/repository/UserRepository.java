@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
 
 
     @Query(value = "select user.username,imageurl from user inner join userdetails on userdetails.user_id = user.id " +
-            "where user.username like  %:name% limit 20", nativeQuery = true)
+            "where user.username like %:name% limit 20", nativeQuery = true)
     List<String> findByName(String name);
 }
 

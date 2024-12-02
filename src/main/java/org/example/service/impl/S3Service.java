@@ -20,12 +20,11 @@ public class S3Service {
         this.s3Client = s3Client;
     }
 
-    public String uploadFile(MultipartFile file, String bucketName) throws IOException {
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, String bucketName, String username) throws IOException {
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
+                .key(username)
                 .contentType(file.getContentType())
                 .build();
 
@@ -33,7 +32,7 @@ public class S3Service {
 
         GetUrlRequest getUrlRequest = GetUrlRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
+                .key(username)
                 .build();
 
         URL url = s3Client.utilities().getUrl(getUrlRequest);

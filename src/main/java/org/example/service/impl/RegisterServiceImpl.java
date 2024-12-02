@@ -63,7 +63,7 @@ public class RegisterServiceImpl implements RegisterService {
     public void registerUserDetails(UserDetailsDTO user) {
         try {
             log.info("Salvando detalhes do usuário: {}", user.getUsername());
-            String imageURL = s3Service.uploadFile(user.getImage(), "profile-pic-foodies");
+            String imageURL = s3Service.uploadFile(user.getImage(), "profile-pic-foodies", user.getUsername());
             user.setImageURL(imageURL);
             log.info("Imagem salva: {}", imageURL);
             UserDetailsModel userModel = new UserDetailsModel();
