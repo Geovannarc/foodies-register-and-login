@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import lombok.extern.log4j.Log4j2;
+import org.example.dto.UserDataDTO;
 import org.example.dto.UserResponseDTO;
 import org.example.model.UserModel;
 import org.example.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -49,7 +51,10 @@ public class LoginServiceImpl implements org.example.service.LoginService {
         return Base64.getUrlEncoder().encodeToString(id.toString().getBytes());
     }
 
-    public List<String> getUsers(String name) {
-        return userRepository.findByName(name);
+    public List<UserDataDTO> getUsers(String name) {
+        List<String> users = userRepository.findByName(name);
+        List<UserDataDTO> userData = new ArrayList<>();
+        users.forEach(user -> userData.add(new UserDataDTO(user.split(",")[0], user.split(",")[1])));
+        return userData;
     }
 }
