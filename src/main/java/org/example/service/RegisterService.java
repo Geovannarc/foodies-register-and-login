@@ -11,4 +11,5 @@ public interface RegisterService {
 
     public void registerUserDetails(final UserDetailsDTO user);
 
+    Object getUserDetails(String username);
 }

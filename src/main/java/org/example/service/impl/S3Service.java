@@ -21,10 +21,11 @@ public class S3Service {
     }
 
     public String uploadFile(MultipartFile file, String bucketName, String username) throws IOException {
+        String fileName = username + ".jpg";
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(username)
+                .key(fileName)
                 .contentType(file.getContentType())
                 .build();
 
@@ -32,7 +33,7 @@ public class S3Service {
 
         GetUrlRequest getUrlRequest = GetUrlRequest.builder()
                 .bucket(bucketName)
-                .key(username)
+                .key(fileName)
                 .build();
 
         URL url = s3Client.utilities().getUrl(getUrlRequest);

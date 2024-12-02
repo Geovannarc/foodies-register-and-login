@@ -6,6 +6,7 @@ import org.example.dto.UserDetailsDTO;
 import org.example.dto.UserResponseDTO;
 import org.example.model.UserDetailsModel;
 import org.example.model.UserModel;
+import org.example.repository.UserDetailRepository;
 import org.example.repository.UserRepository;
 import org.example.service.RegisterService;
 import org.example.util.JwtUtil;
@@ -33,6 +34,9 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Autowired
     private S3Service s3Service;
+
+    @Autowired
+    private UserDetailRepository userDetailRepository;
 
     @Override
     public UserResponseDTO register(final UserDTO userDTO) {
@@ -73,9 +77,23 @@ public class RegisterServiceImpl implements RegisterService {
             userModel.setBio(user.getBio());
             userModel.setUsername(user.getUsername());
             userModel.setImageURL(user.getImageURL());
-            userRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL());
+            userRepository.registerUserDetails(userModel.getUserId(), userModel.getName(), userModel.getBio(), userModel.getImageURL(), userModel.getUsername());
             log.info("User details saved: {}", user.getUsername());
         } catch (JDBCException | IOException e) {
+            throw new RuntimeException("Failed to connect to database");
+        }
+    }
+
+    @Override
+    public Object getUserDetails(String username) {
+        try {
+            log.info("Getting user details: {}", username);
+            UserDetailsModel userDetails = userDetailRepository.getUserDetails(username);
+            if (userDetails == null) {
+                throw new RuntimeException("User not found");
+            }
+            return userDetails;
+        } catch (JDBCException e) {
             throw new RuntimeException("Failed to connect to database");
         }
     }

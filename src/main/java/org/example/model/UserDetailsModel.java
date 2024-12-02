@@ -21,5 +21,8 @@ public class UserDetailsModel {
     private String imageURL;
     private String name;
     private String username;
+    private Long followercount;
+    private Long followingcount;
+    private Long postcount;
 
 }

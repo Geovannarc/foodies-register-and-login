@@ -127,4 +127,9 @@ public class UserController {
     public ResponseEntity<ResponseBuilder> getUsers(@RequestParam("name") String name) {
         return new ResponseEntity<>(new ResponseBuilder(null, loginService.getUsers(name)), HttpStatus.OK);
     }
+
+    @GetMapping("/getProfile")
+    public ResponseEntity<ResponseBuilder> getProfile(@RequestParam("username") String username) {
+        return new ResponseEntity<>(new ResponseBuilder(null, registerService.getUserDetails(username)), HttpStatus.OK);
+    }
 }
